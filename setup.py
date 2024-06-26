@@ -5,6 +5,7 @@ setup(
     version= '0.5.1',
     packages= find_packages(),
     description= ('A Python library offering conventional anonymity functions, as well as Workload-Aware anonymity.'),
+    url = 'https://github.com/farosilva0/anonymity_api',
     keywords= 'anonymity privacy',
     long_description=open('README.md').read(),
     license= 'MIT',
