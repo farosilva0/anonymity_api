@@ -24,8 +24,9 @@ The conventional anonymization functions available are:
 * distinct l-diversity
 * entropy l-diversity
 * recursive (c,l)-diversity
+* t-closeness
 
-Another available function is the suggestion function that, given a dataset and its characteristics ( list with quasi-identifiers and sensitive attributes), suggests an anonymization to use, returning an anonymized dataset without choosing a technique. This is helpful for users who may not know how to anonymize data or aren't familiar with it.
+Another available function is the suggestion function that, given a dataset and its characteristics (list with quasi-identifiers and sensitive attributes), suggests an anonymization to use, returning an anonymized dataset without choosing a technique. This is helpful for users who may not know how to anonymize data or aren't familiar with it.
 
 We also offer Workload-Aware anonymization techniques. These take the usual anonymization parameters also present in the conventional anonymization techniques but, in addition to that, the user can give a query representing to work to be done on the dataset. This ensures higher utility over the tasks to be done.
 
