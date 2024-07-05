@@ -424,8 +424,6 @@ def find_l( data, sens ):
     
     value_counts = data[min_vals].value_counts().to_list()
     
-    # threshold = len(data) * 0.30
-    
     least_common = 0
     
     for sa in sens:
@@ -438,18 +436,44 @@ def find_l( data, sens ):
         if med_vc > least_common:
             least_common = med_vc
         
-    l_val = recur_l = int(len(data) // 10) if int(least_common) == 1 else int(min(least_common , data[sens].nunique().min()))
+    l_val = recur_l = max(int(unique_sas.sum() // 10), 2) if int(least_common) == 1 else int(min(least_common , data[sens].nunique().min()))
     
     l_val = recur_l = max(l_val, data[sens].nunique().min())
     
-    entropy_l = max(math.log(unique_sas.mean()), 1.1)
+    entropy_l = min(math.log(unique_sas.mean()), data_entropy(data, sens))
+    entropy_l = max( entropy_l, 1.1)
      
-    # while sum(value_counts[recur_l-1:]) < threshold:
-    #     recur_l -= 1
-    
     c_val = int(len(data) / sum(value_counts[recur_l-1:]))
     
     return l_val, entropy_l, c_val, recur_l
+
+def data_entropy(partition, sens_atts):
+    '''Returns the data's entropy
+
+    :param partition: partition to evaluate
+    :param sens_atts: sensitive attributes of the partition
+
+    :returns: the entropy value'''
+
+    min_entropy = float('+inf')
+    for sa in sens_atts:
+
+        sum_entropy = 0
+
+        fs = partition[sa].value_counts()
+        fs_dict = fs.to_dict()
+
+        for key in fs_dict:
+
+            fraction = (fs_dict[key] / len(partition))
+
+            sum_entropy += (fraction * math.log(fraction))
+
+        if  (math.e ** -sum_entropy) < min_entropy:
+            min_entropy = math.e ** -sum_entropy
+             
+    
+    return min_entropy
 
 
 def create_hierarchies( filename ):

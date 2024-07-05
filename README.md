@@ -1,6 +1,6 @@
 This is a Python library that offers conventional anonymization techniques, utility metrics, and verification methods.
 
-# Instalation
+# Installation
 
 You can install the package via the command line:
 
