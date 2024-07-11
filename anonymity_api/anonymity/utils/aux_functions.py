@@ -438,8 +438,6 @@ def find_l( data, sens ):
         
     l_val = recur_l = max(int(unique_sas.sum() // 10), 2) if int(least_common) == 1 else int(min(least_common , data[sens].nunique().min()))
     
-    l_val = recur_l = max(l_val, data[sens].nunique().min())
-    
     entropy_l = min(math.log(unique_sas.mean()), data_entropy(data, sens))
     entropy_l = max( entropy_l, 1.1)
      
