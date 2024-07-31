@@ -26,7 +26,7 @@ def suggest_anonymity(data, quasi_idents, sens, idents = [], queries = None, tax
     print(unique_qis)
     
     k_val = aux_functions.find_k(data, quasi_idents)
-    l_val, entropy_l, c_val, recur_l = aux_functions.find_l(data, sens)
+    l_val, entropy_l, c_val, recur_l = aux_functions.find_l(data, sens, k_val)
     
     if queries is not None:
         corr, queries_proc = aux_functions.check_corr( queries )
@@ -38,8 +38,8 @@ def suggest_anonymity(data, quasi_idents, sens, idents = [], queries = None, tax
             
             k_val = min(aux_functions.find_k(query_df, quasi_idents), aux_functions.find_k(rest_df, quasi_idents))
             
-            l_val, entropy_l, c_val, recur_l = aux_functions.find_l(query_df, sens)
-            l_val2, entropy_l2, c_val2, recur_l2 = aux_functions.find_l(data, sens)
+            l_val, entropy_l, c_val, recur_l = aux_functions.find_l(query_df, sens, k_val)
+            l_val2, entropy_l2, c_val2, recur_l2 = aux_functions.find_l(data, sens, k_val)
             
             l_val = min(l_val, l_val2)
             entropy_l = min(entropy_l, entropy_l2)

@@ -405,10 +405,10 @@ def find_k( data, quasi_idents ):
     uniques = data[quasi_idents].nunique().to_list()
     uniques.sort()
     
-    return min(k_val, uniques[len (uniques) // 2 -1])
+    return math.ceil(min(k_val, uniques[len (uniques) // 2 -1]))
 
 
-def find_l( data, sens ):
+def find_l( data, sens, k_val ):
     '''Tries to find the values to use in all kinds of l-diversity.
     For l-diversity its chosen the minimum between the sensitive attribute with the lowest unique value, and the minimum average of tuples per different value in a sensitive attribute.
     The value of l for entropy l-diversity is log( average number of unique values per sensitive-attribute )
@@ -436,7 +436,7 @@ def find_l( data, sens ):
         if med_vc > least_common:
             least_common = med_vc
         
-    l_val = recur_l = max(int(unique_sas.sum() // 10), 2) if int(least_common) == 1 else int(min(least_common , data[sens].nunique().min()))
+    l_val = recur_l = int(k_val) if int(least_common) == 1 else int(min(least_common , data[sens].nunique().min()))
     
     entropy_l = min(math.log(unique_sas.mean()), data_entropy(data, sens))
     entropy_l = max( entropy_l, 1.1)

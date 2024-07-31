@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name= 'anonymity_api',
-    version= '1.0.0',
+    version= '1.0.2',
     packages= find_packages(),
     description= ('A Python library offering conventional anonymity functions, as well as Workload-Aware anonymity.'),
     url = 'https://github.com/farosilva0/anonymity_api',
