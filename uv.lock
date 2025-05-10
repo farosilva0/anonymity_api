@@ -5,7 +5,7 @@ requires-python = ">=3.13"
 [[package]]
 name = "anonymity-api"
 version = "1.0.4"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "numpy" },
     { name = "pandas" },
