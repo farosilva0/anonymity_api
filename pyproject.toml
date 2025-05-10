@@ -1,16 +1,40 @@
 [project]
 name = "anonymity-api"
 version = "1.0.4"
+license = "MIT"
 description = "Python library that offers conventional anonymization techniques, utility metrics, and verification methods."
 readme = "README.md"
 requires-python = ">=3.13"
+classifiers = [
+  'Operating System :: OS Independent',
+  'Programming Language :: Python',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.13',
+  'Topic :: Security'
+]
 dependencies = [
     "numpy>=2.2.5",
     "pandas>=2.2.3",
 ]
 
+[project.urls]
+source = "https://github.com/farosilva0/anonymity_api"
+download = "https://pypi.org/project/anonymity-api/#files"
+
 [dependency-groups]
 dev = [
     "basedpyright>=1.29.1",
     "ruff>=0.11.9",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+include = [
+  "*.py",
+  "README.md",
+  "LICENSE",
+  "pyproject.toml"
 ]
