@@ -1,6 +1,6 @@
 [project]
 name = "anonymity-api"
-version = "1.0.4"
+version = "1.0.5"
 license = "MIT"
 description = "Python library that offers conventional anonymization techniques, utility metrics, and verification methods."
 readme = "README.md"
