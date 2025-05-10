@@ -1,0 +1,138 @@
+name: release
+
+# inspired by: https://github.com/ArjanCodes/bragir/blob/main/.github/workflows/release.yaml
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+a[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+b[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+dev[0-9]+"
+
+jobs:
+
+  details:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.release.outputs.new_version }}
+      suffix: ${{ steps.release.outputs.suffix }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Check Ref Type
+        if: github.ref_type != 'tag'
+        run: echo "This is not a tag; exiting"; exit 1
+
+      - name: Extract tag and Details
+        id: release
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
+          SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "")
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "suffix=$SUFFIX" >> "$GITHUB_OUTPUT"
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+
+
+  setup_and_build:
+    needs: [details]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Bump version
+        run: |
+          NEW_VERSION="${{ needs.details.outputs.new_version }}"
+          sed -i "s/version = \"[0-9]*\.[0-9]*\.[0-9]*\"/version = \"$NEW_VERSION\"/" $GITHUB_WORKSPACE/pyproject.toml
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Build source and wheel distribution
+        run: uv build
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  pypi_publish:
+    name: Upload release to PyPI
+    needs: [setup_and_build, details]
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+    permissions:
+      id-token: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Publish to PyPI
+        run: uv publish
+
+  github_release:
+    name: Create GitHub Release
+    needs: [setup_and_build, details]
+    runs-on: ubuntu-latest
+    env:
+      TAG_NAME: ${{ needs.details.outputs.tag_name }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Create GitHub Release
+        id: create_release
+        run: gh release create ${{ env.TAG_NAME }} dist/* --title ${{ env.TAG_NAME }} --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+
+  bump_version:
+    needs: [details, github_release, pypi_publish]
+    runs-on: ubuntu-latest
+    env:
+      NEW_VERSION: ${{ needs.details.outputs.new_version }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+      - name: Bump version
+        run: |
+          NEW_VERSION=${{ env.NEW_VERSION }}
+          sed -i "s/version = \"[0-9]*\.[0-9]*\.[0-9]*\"/version = \"$NEW_VERSION\"/" $GITHUB_WORKSPACE/pyproject.toml
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Bumping version to ${{ env.NEW_VERSION }}
+          branch: main
+          file_pattern: "pyproject.toml"
+          skip_dirty_check: true
