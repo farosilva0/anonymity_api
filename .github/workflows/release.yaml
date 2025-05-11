@@ -125,14 +125,20 @@ jobs:
         with:
           fetch-depth: 0 
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@4
+
       - name: Bump version
         run: |
           NEW_VERSION=${{ env.NEW_VERSION }}
           sed -i "s/version = \"[0-9]*\.[0-9]*\.[0-9]*\"/version = \"$NEW_VERSION\"/" $GITHUB_WORKSPACE/pyproject.toml
+          uv sync
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: Bumping version to ${{ env.NEW_VERSION }}
+          commit_message: "chore: Bumping version to ${{ env.NEW_VERSION }}"
           branch: main
-          file_pattern: "pyproject.toml"
+          file_pattern: |
+            pyproject.toml
+            uv.lock
           skip_dirty_check: true
