@@ -1,9 +1,12 @@
+from codecs import ascii_encode
 import random
 
 import numpy as np
 import pandas as pd
 
 from anonymity_api.anonymity.utils import aux_functions
+from sentence_transformers import SentenceTransformer
+from scipy.cluster.hierarchy import linkage, leaves_list
 
 
 def anonymize_k(partition, quasi_idents, k, explored_qis, corr_att, taxonomies):
@@ -341,5 +344,66 @@ def rank_swap_distribution(data: pd.DataFrame, qis: list[str], p: int) -> pd.Dat
         data = data.set_index("index")
 
         data = data.sort_index(axis=0, ascending=True, inplace=False)
+
+    return data
+
+
+def rank_swap_categorical(data: pd.DataFrame, qis: list[str], p: int) -> pd.DataFrame:
+    """Swaps values for the quasi-identifiers based on the distribution given by p
+    This function supports swapping categorical values, by using their encodings as their value
+
+    :param data: Dataset to be anonymized
+    :param qis: quasi-identifiers
+    :param p: swapping interval
+
+    :returns: anonymized dataset"""
+    model = SentenceTransformer("all-mpnet-base-v2")
+
+    for qi in qis:
+        if not pd.api.types.is_string_dtype(data[qi]):
+            data = data.sort_values(by=qi)
+            data = data.reset_index()
+            orig = data.copy()
+
+            for i in range(len(data) - 1):
+                if data[qi][i] == orig[qi][i]:
+                    swap_pos = i + round(np.random.normal(p / 2, p / 2))
+
+                    if swap_pos > 0 and swap_pos < len(data) - 1:
+                        data.at[i, qi], data.at[swap_pos, qi] = (
+                            data.at[swap_pos, qi],
+                            data.at[i, qi],
+                        )
+
+            data = data.set_index("index")
+
+            data = data.sort_index(axis=0, ascending=True, inplace=False)
+
+        else:
+            values = data[qi].unique().tolist()
+            embeddings = model.encode(values)
+            links = linkage(embeddings, method="ward")
+            leaves = leaves_list(links)
+            order = [values[i] for i in leaves]
+
+            data[qi] = pd.Categorical(data[qi], categories=order, ordered=True)
+            data = data.sort_values(by=qi)
+            data = data.reset_index()
+
+            orig = data.copy()
+
+            for i in range(len(data) - 1):
+                if data[qi][i] == orig[qi][i]:
+                    swap_pos = i + round(np.random.normal(p / 2, p / 2))
+
+                    if swap_pos > 0 and swap_pos < len(data) - 1:
+                        data.at[i, qi], data.at[swap_pos, qi] = (
+                            data.at[swap_pos, qi],
+                            data.at[i, qi],
+                        )
+
+            data = data.set_index("index")
+
+            data = data.sort_index(axis=0, ascending=True, inplace=False)
 
     return data

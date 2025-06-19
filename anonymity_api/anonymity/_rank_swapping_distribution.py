@@ -23,3 +23,17 @@ def rank_swapping_distribution(
     qis = quasi_idents.copy()
 
     return anon_functions.rank_swap_distribution(data, qis, p).reset_index(drop=True)
+
+
+def rank_swapping_categorical(
+    data: pd.DataFrame, quasi_idents: list[str], p, idents=[]
+) -> pd.DataFrame:
+    data = data.copy()
+
+    if idents != []:
+        for attribute in idents:
+            del data[attribute]
+
+    qis = quasi_idents.copy()
+
+    return anon_functions.rank_swap_categorical(data, qis, p).reset_index(drop=True)

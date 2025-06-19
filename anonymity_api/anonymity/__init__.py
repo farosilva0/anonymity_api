@@ -12,6 +12,7 @@ from ._suggestion import suggest_anonymity
 from ._suggestion import suggest_anonymity_groups
 from ._rank_swapping import rank_swapping
 from ._rank_swapping_distribution import rank_swapping_distribution
+from ._rank_swapping_distribution import rank_swapping_categorical
 
 """This module holds the functions to anonymize datasets"""
 
@@ -30,5 +31,5 @@ __all__ = [
     "suggest_anonymity_groups",
     "rank_swapping",
     "rank_swapping_distribution",
+    "rank_swapping_categorical",
 ]
-
