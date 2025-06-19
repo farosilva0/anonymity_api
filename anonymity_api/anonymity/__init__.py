@@ -10,20 +10,25 @@ from ._workload_aware import workload_aware_recursive_c_l_diversity
 from ._workload_aware import workload_aware_t_closeness
 from ._suggestion import suggest_anonymity
 from ._suggestion import suggest_anonymity_groups
+from ._rank_swapping import rank_swapping
+from ._rank_swapping_distribution import rank_swapping_distribution
 
-'''This module holds the functions to anonymize datasets'''
+"""This module holds the functions to anonymize datasets"""
 
 __all__ = [
-    'k_anonymity',
-    'distinct_l_diversity',
-    'entropy_l_diversity',
-    'recursive_cl_diversity',
-    't_closeness',
-    'workload_aware_k_anonymity',
-    'workload_aware_distinct_l_diversity',
-    'workload_aware_entropy_l_diversity',
-    'workload_aware_recursive_c_l_diversity',
-    'workload_aware_t_closeness',
-    'suggest_anonymity',
-    'suggest_anonymity_groups'
+    "k_anonymity",
+    "distinct_l_diversity",
+    "entropy_l_diversity",
+    "recursive_cl_diversity",
+    "t_closeness",
+    "workload_aware_k_anonymity",
+    "workload_aware_distinct_l_diversity",
+    "workload_aware_entropy_l_diversity",
+    "workload_aware_recursive_c_l_diversity",
+    "workload_aware_t_closeness",
+    "suggest_anonymity",
+    "suggest_anonymity_groups",
+    "rank_swapping",
+    "rank_swapping_distribution",
 ]
+
